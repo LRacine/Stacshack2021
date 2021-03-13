@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include "decodeencode.h"
 #include "copybitmap.h"
+#include "aes.h"
 
 static BMP* bmp;
 static unsigned char* image;
@@ -47,11 +48,20 @@ Data readInput() {
     return data;
 }
 
+unsigned char* encrypt(unsigned char* message, unsigned char* key) {
+    int key_size;
+    int* key_schedule;
+    unsigned char* output;
+    aes_key_setup(key, key_schedule, &key_size);
+    aes_encrypt(message, output, key_schedule, key_size);
+    return message;
+}
+
 int main(int argc, char const *argv[]) {
 
-    if (argc < 3 || argc > 4 || (argc == 2 && !strcmp("decode", argv[1])) ||
-        (argc == 3 && !strcmp("encode", argv[1]))) {
-        printf("   usage %s encode <in file> <out file>\nor usage %s decode <in file>\n", argv[0], argv[0]);
+    if (argc < 4 || argc > 5 || (argc == 3 && !strcmp("decode", argv[1])) ||
+        (argc == 4 && !strcmp("encode", argv[1]))) {
+        printf("   usage %s encode <in file> <out file> <key>\nor usage %s decode <in file>\n", argv[0], argv[0]);
         return 1;
     }
 
