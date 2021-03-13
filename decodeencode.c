@@ -20,7 +20,7 @@ void encode(Data data, unsigned char* image, unsigned long image_size)
     image[0] |= bit_mask;
     image[0] = ~(~image[0] | (bit_mask >> 1) + 1);
 
-    int image_index = 0;
+    unsigned long image_index = 0;
     int byte_index = 0;
     int bit_index = 0;
     while (image_index++ < image_size)
@@ -62,7 +62,7 @@ Data decode(const unsigned char* image, unsigned long image_size)
     }
     while (mask > 0);
 
-    int image_index = 1;
+    unsigned long image_index = 1;
     int byte_index = 0;
     int bit_index = 0;
     while(byte_index < total_bytes)

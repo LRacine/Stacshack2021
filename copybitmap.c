@@ -2,12 +2,12 @@
 #include <stdlib.h>
 
 
-unsigned char* extract_rbg_only(BMP* bmp, int size) {
+unsigned char* extract_rbg_only(BMP* bmp, unsigned long size) {
     unsigned char* pixels = malloc(sizeof(unsigned char) * size);
 
     unsigned int x, y;
     unsigned char r, g, b;
-    int index = 0;
+    unsigned long index = 0;
     for (x = 0; x < bmp->width; x++) {
         for (y = 0; y < bmp->height; y++) {
             // Gets pixel rgb values at point (x, y)
@@ -28,7 +28,7 @@ void destroy(unsigned char* pixels) {
 void add_bytes_back(BMP* bmp, unsigned char* pixels) {
     unsigned int x, y;
     unsigned char r, g, b;
-    int index = 0;
+    unsigned long index = 0;
     for (x = 0; x < bmp->width; x++) {
         for (y = 0; y < bmp->height; y++) {
             r = pixels[index++];

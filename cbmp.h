@@ -44,7 +44,7 @@ int get_height(BMP* bmp);
 unsigned int get_depth(BMP* bmp);
 void get_pixel_rgb(BMP* bmp, int x, int y, unsigned char* r, unsigned char* g, unsigned char* b);
 void set_pixel_rgb(BMP* bmp, int x, int y, unsigned char r, unsigned char g, unsigned char b);
-void bwrite(BMP* bmp, char* file_name);
+void bwrite(BMP* bmp, const char* file_name);
 void bclose(BMP* bmp);
 
 #ifdef __cplusplus

@@ -147,7 +147,7 @@ void set_pixel_rgb(BMP* bmp, int x, int y, unsigned char r, unsigned char g, uns
     bmp->pixels[index].blue = b;
 }
 
-void bwrite(BMP* bmp, char* file_name)
+void bwrite(BMP* bmp, const char* file_name)
 {
     _map(bmp, _update_file_byte_contents);
 
