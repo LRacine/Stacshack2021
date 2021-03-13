@@ -6,22 +6,29 @@
 #include <string.h>
 #include <stdlib.h>
 #include "decodeencode.h"
-#include "copybitmap.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
-static BMP* bmp;
-static unsigned char* image;
-static double SCALING_FACTOR = 1.5;
+static int SCALING_FACTOR = 2;
 
-void cleanup() {
-    destroy(image);
-    bclose(bmp);
-}
-
-unsigned long setup(const char* filepath) {
-    bmp = bopen(filepath);
-    unsigned long image_size = (unsigned long) bmp->height * (unsigned long) bmp->width * (bmp->depth / 8);
-    image = extract_rbg_only(bmp, image_size);
-    return image_size;
+double pow(double x, double exp)
+{
+    double temp;
+    int y = (int)exp;
+    if(y == 0)
+        return 1;
+    temp = pow(x, y/2);
+    if (y % 2 == 0)
+        return temp*temp;
+    else
+    {
+        if(y > 0)
+            return x*temp*temp;
+        else
+            return (temp*temp)/x;
+    }
 }
 
 Data readInput() {
@@ -33,8 +40,9 @@ Data readInput() {
     while (scanf("%c", &character) != EOF) {
         message[index++] = character;
         if (index == capacity) {
-            char* temp = realloc(message, sizeof(char) * capacity * SCALING_FACTOR);
-            if (temp == NULL) {
+            capacity *= SCALING_FACTOR;
+            message = realloc(message, sizeof(unsigned char) * capacity);
+            if (message == NULL) {
                 perror("no more memory!!!\n");
                 exit(1);
             }
@@ -54,13 +62,21 @@ int main(int argc, char const *argv[]) {
         printf("   usage %s encode <in file> <out file>\nor usage %s decode <in file>\n", argv[0], argv[0]);
         return 1;
     }
-
-    unsigned long image_size = setup(argv[2]);
+    int width, height, channels;
+    unsigned char* image = stbi_load(argv[2], &width, &height, &channels, 0);
+    unsigned long image_size = (unsigned long)width * height * channels;
     if (!strcmp("encode", argv[1])) {
         Data message = readInput();
         encode(message, image, image_size);
-        add_bytes_back(bmp, image);
-        bwrite(bmp, argv[3]);
+        switch (argv[3][strlen(argv[3]) - 1])
+        {
+            case 'p':
+                stbi_write_bmp(argv[3], width, height, channels, image);
+                break;
+            case 'g':
+                stbi_write_png(argv[3], width, height, channels, image, width * channels);
+                break;
+        }
     }
     else {
         Data result = decode(image, image_size);
@@ -68,6 +84,6 @@ int main(int argc, char const *argv[]) {
         printf("%.*s\n", size, result.data + sizeof(int));
     }
 
-    cleanup();
+    stbi_image_free(image);
     return 0;
 }
