@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include "decodeencode.h"
+#include "copybitmap.h"
 
 int main()
 {
