@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include "decodeencode.h"
 #include "copybitmap.h"
-#include "cbmp.h"
 
 static BMP* bmp;
 static unsigned char* image;
@@ -18,9 +17,9 @@ void cleanup() {
     bclose(bmp);
 }
 
-unsigned long setup() {
-    bmp = bopen("../images/bond.bmp");
-    unsigned long image_size = (unsigned long) bmp->height * (unsigned long) bmp->width * 3;
+unsigned long setup(const char* filepath) {
+    bmp = bopen(filepath);
+    unsigned long image_size = (unsigned long) bmp->height * (unsigned long) bmp->width * (bmp->depth / 8);
     image = extract_rbg_only(bmp, image_size);
     return image_size;
 }
@@ -52,11 +51,11 @@ int main(int argc, char const *argv[]) {
 
     if (argc < 3 || argc > 4 || (argc == 2 && !strcmp("decode", argv[1])) ||
         (argc == 3 && !strcmp("encode", argv[1]))) {
-        printf("   usage %s encode <in file> <out file>\n or usage %s decode <in file>\n", argv[0], argv[0]);
+        printf("   usage %s encode <in file> <out file>\nor usage %s decode <in file>\n", argv[0], argv[0]);
         return 1;
     }
 
-    unsigned long image_size = setup();
+    unsigned long image_size = setup(argv[2]);
     if (!strcmp("encode", argv[1])) {
         Data message = readInput();
         encode(message, image, image_size);
@@ -66,7 +65,7 @@ int main(int argc, char const *argv[]) {
     else {
         Data result = decode(image, image_size);
         int size = *((int*) result.data);
-        printf("%*s\n", size, result.data + 4);
+        printf("%.*s\n", size, result.data + sizeof(int));
     }
 
     cleanup();

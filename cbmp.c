@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include "cbmp.h"
 
 // Constants
@@ -28,7 +29,7 @@
 void _throw_error(char* message);
 unsigned int _get_int_from_buffer(unsigned int bytes, 
                                   unsigned int offset, 
-                                  unsigned char* buffer);
+                                  const unsigned char* buffer);
 unsigned int _get_file_byte_number(FILE* fp);
 unsigned char* _get_file_byte_contents(FILE* fp, unsigned int file_byte_number);
 int _validate_file_type(unsigned char* file_byte_contents);
@@ -44,7 +45,7 @@ void _get_pixel(BMP* bmp, int index, int offset, int channel);
 
 // Public function implementations
 
-BMP* bopen(char* file_path)
+BMP* bopen(const char* file_path)
 {
     FILE* fp = fopen(file_path, "rb");
   
@@ -177,9 +178,9 @@ void _throw_error(char* message)
 
 unsigned int _get_int_from_buffer(unsigned int bytes, 
                                   unsigned int offset, 
-                                  unsigned char* buffer)
+                                  const unsigned char* buffer)
 {
-    unsigned char* _buffer = (unsigned char*) malloc(bytes * sizeof(unsigned char));
+    unsigned char* _buffer = (unsigned char*) calloc(sizeof (unsigned int), sizeof(unsigned char));
 
     unsigned int i;
     for (i = 0; i < bytes; i++)
@@ -242,7 +243,7 @@ int _get_height(unsigned char* file_byte_contents)
 
 unsigned int _get_depth(unsigned char* file_byte_contents)
 {
-    return _get_int_from_buffer(DEPTH_BYTES, DEPTH_OFFSET, file_byte_contents);
+    return (int) _get_int_from_buffer(DEPTH_BYTES, DEPTH_OFFSET, file_byte_contents);
 }
 
 void _update_file_byte_contents(BMP* bmp, int index, int offset, int channel)

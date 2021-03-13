@@ -26,7 +26,7 @@ void encode(Data data, unsigned char* image, unsigned long image_size)
     while (image_index++ < image_size)
     {
         uint16_t data_temp = (uint16_t) getImageByte(data.data, byte_index, data.size)
-                          | (uint16_t) getImageByte(data.data, byte_index + 1, data.size) << 8;
+                           | (uint16_t) getImageByte(data.data, byte_index + 1, data.size) << 8;
         data_temp &= bit_mask << bit_index;
         data_temp >>= bit_index;
         image[image_index] = ~(~image[image_index] | bit_mask) | data_temp;
