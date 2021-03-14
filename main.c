@@ -81,26 +81,26 @@ void create_keys() {
 }
 
 void encrypt(Data* message, const char* keypath) {
-    int new_size = 4 + (message->size - 4) * 8;
+    int new_size = 4 + ((int)message->size - 4) * 8;
     unsigned char* new_message = malloc(new_size);
     key_class key = get_key(keypath);
     unsigned char* encrypted_message = (unsigned char *) rsa_encrypt((const char *) (message->data + 4), message->size - 4, &key);
     memcpy(new_message + 4, encrypted_message, new_size - 4);
     message->size = new_size;
-    *((int*) new_message) = new_size - 4;
+    *((int*) new_message) = (int)new_size - 4;
     free(message->data);
     message->data = new_message;
     free(encrypted_message);
 }
 
 void decrypt(Data* message, const char* keypath) {
-    int new_size = 4 + (message->size - 4) / 8;
+    int new_size = 4 + (*((int*) message->data)) / 8;
     unsigned char* new_message = malloc(new_size);
     key_class key = get_key(keypath);
-    unsigned char* decrypt_message = (unsigned char *) rsa_decrypt((const long long *) (message->data + 4), message->size - 4, &key);
+    unsigned char* decrypt_message = (unsigned char *) rsa_decrypt((const long long *) (message->data + 4), (*((int*) message->data)), &key);
     memcpy(new_message + 4, decrypt_message, new_size - 4);
     message->size = new_size;
-    *((int*) new_message) = new_size - 4;
+    *((int*) new_message) = (int)new_size - 4;
     free(message->data);
     message->data = new_message;
     free(decrypt_message);
@@ -137,7 +137,7 @@ int main(int argc, char const *argv[]) {
     }
     else {
         Data result = decode(image, image_size);
-        decrypt(&result, argv[4]);
+        decrypt(&result, argv[3]);
         int size = *((int*) result.data);
         printf("%.*s\n", size, result.data + sizeof(int));
     }
