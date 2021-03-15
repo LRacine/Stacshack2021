@@ -46,7 +46,8 @@ long long ExtEuclid(long long a, long long b)
 long long rsa_modExp(long long b, long long e, long long m)
 {
   if (b < 0 || e < 0 || m <= 0){
-    exit(1);
+      printf("Encryption error!");
+      exit(1);
   }
   b = b % m;
   if(e == 0) return 1;
@@ -145,7 +146,7 @@ void rsa_gen_keys(struct public_key_class *pub, struct private_key_class *priv, 
 }
 
 
-long long *rsa_encrypt(const char *message, const unsigned long message_size, 
+long long *rsa_encrypt(const unsigned char *message, const unsigned long message_size,
                      const struct public_key_class *pub)
 {
   long long *encrypted = malloc(sizeof(long long)*message_size);

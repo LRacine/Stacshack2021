@@ -11,6 +11,14 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 #include "rsa.h"
+#ifdef _WIN32
+# include <io.h>
+# include <fcntl.h>
+# define SET_BINARY_MODE(handle) setmode(handle, O_BINARY)
+#else
+# define SET_BINARY_MODE(handle) ((void)0)
+#endif
+
 
 static int SCALING_FACTOR = 2;
 
@@ -36,10 +44,10 @@ Data readInput(FILE* fp) {
     Data data;
     unsigned char* message = malloc(sizeof(char) * 20);
     int index = 4;
-    char character;
+    int character;
     int capacity = 20;
-    while (fscanf(fp, "%c", &character) != EOF) {
-        message[index++] = character;
+    while ((character = getc(fp)) != EOF) {
+        message[index++] = (unsigned char)character;
         if (index == capacity) {
             capacity *= SCALING_FACTOR;
             message = realloc(message, sizeof(unsigned char) * capacity);
@@ -107,6 +115,10 @@ void decrypt(Data* message, const char* keypath) {
 }
 
 int main(int argc, char const *argv[]) {
+    freopen(NULL, "rb", stdin); //Read binary from stdin
+    SET_BINARY_MODE(stdin);
+    freopen(NULL, "wb", stdout); //Read binary from stdin
+    SET_BINARY_MODE(stdout);
 
     if (argc == 2 && !strcmp("key-gen", argv[1])) {
         create_keys();
@@ -122,7 +134,7 @@ int main(int argc, char const *argv[]) {
     unsigned char* image = stbi_load(argv[2], &width, &height, &channels, 0);
     unsigned long image_size = (unsigned long)width * height * channels;
     if (!strcmp("encode", argv[1])) {
-        Data message = readInput(stdin);
+        Data message = readInput(fopen("H:\\Downloads\\temp\\cow.jpg", "rb"));
         encrypt(&message, argv[4]);
         encode(message, image, image_size);
         switch (argv[3][strlen(argv[3]) - 1])
@@ -130,8 +142,8 @@ int main(int argc, char const *argv[]) {
             case 'p':
                 stbi_write_bmp(argv[3], width, height, channels, image);
                 break;
-            case 'g':
-                printf("%d\n", stbi_write_png(argv[3], width, height, channels, image, width * channels));
+            default:
+                stbi_write_png(argv[3], width, height, channels, image, width * channels);
                 break;
         }
     }
@@ -139,7 +151,8 @@ int main(int argc, char const *argv[]) {
         Data result = decode(image, image_size);
         decrypt(&result, argv[3]);
         int size = *((int*) result.data);
-        printf("%.*s\n", size, result.data + sizeof(int));
+        fwrite(result.data + sizeof(int), sizeof(unsigned char), size, stdout);
+        //printf("%.*s\n", size, result.data + sizeof(int));
     }
 
     stbi_image_free(image);

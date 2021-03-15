@@ -67,7 +67,7 @@ Data decode(const unsigned char* image, unsigned long image_size)
     int bit_index = 0;
     while(byte_index < total_bytes)
     {
-        unsigned char data = image[image_index] & (data_mask);
+        uint16_t data = image[image_index] & (data_mask);
         data <<= bit_index;
         int overflow_mask = 0xFF00;
         unsigned char overflow_data = (data & overflow_mask) >> 8;
