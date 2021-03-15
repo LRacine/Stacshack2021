@@ -134,7 +134,7 @@ int main(int argc, char const *argv[]) {
     unsigned char* image = stbi_load(argv[2], &width, &height, &channels, 0);
     unsigned long image_size = (unsigned long)width * height * channels;
     if (!strcmp("encode", argv[1])) {
-        Data message = readInput(fopen("H:\\Downloads\\temp\\cow.jpg", "rb"));
+        Data message = readInput(stdin);
         encrypt(&message, argv[4]);
         encode(message, image, image_size);
         switch (argv[3][strlen(argv[3]) - 1])
