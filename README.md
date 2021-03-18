@@ -7,4 +7,4 @@ The theme for this hackathon was *007 James Bond*, we chose the challenge
 sleep deprived during some of it, use this code at your own peril :wink:.
 
 Also, if you want a good laugh, here is our promotional video for the submission:
-https://www.youtube.com/watch?v=oDsV2TiykZA
+https://youtu.be/zCh8h-m0OlQ
